@@ -40,7 +40,6 @@ def get_video_stream_url(video_url: str) -> str | None:
 
 def search_url(start_time, base_urls, channel_id, video_id):
     urls = []
-    print("Start time:", start_time)
     for offset in range(-5, 6):
         adjusted_time = start_time + timedelta(minutes=offset)
 
