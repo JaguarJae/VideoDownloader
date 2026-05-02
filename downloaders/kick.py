@@ -3,10 +3,11 @@ from kickapi import KickAPI
 import cloudscraper
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
 api = KickAPI()
 session = cloudscraper.CloudScraper()
 
-def get_video_stream_url(video_url: str) -> str | None:
+def get_raw_stream_url(video_url: str) -> str | None:
         try:
             parts = video_url.split("/")
             if len(parts) < 6:
@@ -15,7 +16,7 @@ def get_video_stream_url(video_url: str) -> str | None:
             channel_name = parts[3]
             video_slug = parts[5]
             print("Searching Videos...")
-            video = search_video(channel_name, video_slug)
+            video = search_videos(channel_name, video_slug)
 
             thumbnail_url = video.thumbnail["src"]
             start_time = datetime.strptime(video.start_time, "%Y-%m-%d %H:%M:%S")
@@ -28,7 +29,7 @@ def get_video_stream_url(video_url: str) -> str | None:
             ]
             print("Searching URL...")
 
-            stream_url = search_url(start_time, base_urls, channel_id, video_id)
+            stream_url = search_urls(start_time, base_urls, channel_id, video_id)
             if (stream_url is not None):
                 return stream_url
             else:
@@ -38,7 +39,7 @@ def get_video_stream_url(video_url: str) -> str | None:
             print(f"Error: {e}")
             return None
 
-def search_url(start_time, base_urls, channel_id, video_id):
+def search_urls(start_time, base_urls, channel_id, video_id):
     urls = []
     for offset in range(-5, 6):
         adjusted_time = start_time + timedelta(minutes=offset)
@@ -60,7 +61,7 @@ def search_url(start_time, base_urls, channel_id, video_id):
                 return result
     return None
 
-def search_video(channel_name, video_slug):
+def search_videos(channel_name, video_slug):
     channel = api.channel(channel_name)
 
     for video in channel.videos:
@@ -79,10 +80,20 @@ def try_url(url):
         return None
     return None
 
-def download_video(url):
+def raw_download(url, platform):
     ydl_opts = {
-        'outtmpl': '%(title)s.%(ext)s',
+        'outtmpl': f'downloads/{platform}/%(title)s.%(ext)s',
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]'
     }
 
     yt_dlp.YoutubeDL(ydl_opts).download(url)
+
+def download_url(url):
+    try: 
+        raw_download(url, "kick")
+    except:
+        print("Trying another way")
+        raw_url = get_raw_stream_url(url)
+        if (raw_url != None):
+            print("Found URL:", raw_url)
+            raw_download(raw_url, "kick")
