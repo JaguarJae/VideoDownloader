@@ -7,39 +7,49 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 api = KickAPI()
 session = cloudscraper.CloudScraper()
 
-def get_raw_stream_url(video_url: str) -> str | None:
-        try:
-            parts = video_url.split("/")
-            if len(parts) < 6:
-                return None
-            
-            channel_name = parts[3]
-            video_slug = parts[5]
-            print("Searching Videos...")
-            video = search_videos(channel_name, video_slug)
-
-            thumbnail_url = video.thumbnail["src"]
-            start_time = datetime.strptime(video.start_time, "%Y-%m-%d %H:%M:%S")
-            path_parts = thumbnail_url.split("/")
-            channel_id, video_id = path_parts[4], path_parts[5]
-            base_urls = [
-                "https://stream.kick.com/ivs/v1/196233775518",
-                "https://stream.kick.com/3c81249a5ce0/ivs/v1/196233775518",                        
-                "https://stream.kick.com/0f3cb0ebce7/ivs/v1/196233775518"
-            ]
-            print("Searching URL...")
-
-            stream_url = search_urls(start_time, base_urls, channel_id, video_id)
-            if (stream_url is not None):
-                return stream_url
-            else:
-                print("No stream URL found")
-                return None
-        except Exception as e:
-            print(f"Error: {e}")
+def get_raw_stream_url(video_url):
+    try:
+        parts = video_url.split("/")
+        if len(parts) < 6:
             return None
+            
+        channel_name = parts[3]
+        video_slug = parts[5]
+        print("Searching Videos...")
+        video = search_videos(channel_name, video_slug)
 
-def search_urls(start_time, base_urls, channel_id, video_id):
+        thumbnail_url = video.thumbnail["src"]
+        start_time = datetime.strptime(video.start_time, "%Y-%m-%d %H:%M:%S")
+        path_parts = thumbnail_url.split("/")
+        channel_id, video_id = path_parts[4], path_parts[5]
+        base_urls = [
+            "https://stream.kick.com/ivs/v1/196233775518",
+            "https://stream.kick.com/3c81249a5ce0/ivs/v1/196233775518",                        
+            "https://stream.kick.com/0f3cb0ebce7/ivs/v1/196233775518"
+        ]
+        print("Searching URL...")
+
+        stream_url = search_url(start_time, base_urls, channel_id, video_id)
+        if (stream_url is not None):
+            return stream_url
+        else:
+            print("No stream URL found")
+            return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+def search_videos(channel_name, video_slug):
+    channel = api.channel(channel_name)
+
+    for video in channel.videos:
+        if video.uuid == video_slug:
+            return video
+        
+    print("No video found")
+    return None
+
+def search_url(start_time, base_urls, channel_id, video_id):
     urls = []
     for offset in range(-5, 6):
         adjusted_time = start_time + timedelta(minutes=offset)
@@ -59,16 +69,6 @@ def search_urls(start_time, base_urls, channel_id, video_id):
 
             if result is not None:
                 return result
-    return None
-
-def search_videos(channel_name, video_slug):
-    channel = api.channel(channel_name)
-
-    for video in channel.videos:
-        if video.uuid == video_slug:
-            return video
-        
-    print("No video found")
     return None
 
 def try_url(url):
