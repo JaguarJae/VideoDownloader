@@ -1,29 +1,68 @@
-from kickapi import KickAPI
-from datetime import datetime, timedelta
+import requests
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta, timezone
 
-kick_api = KickAPI()
+def get_token(client_id, client_secret):
+    url = "https://id.kick.com/oauth/token"
+    token_headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "grant_type": "client_credentials"
+    }
 
-def get_kick_vods(username, days):
-    channel = kick_api.channel(username)
-    allvideos = channel.videos
-    print(allvideos[1].title, allvideos[1].stream)
-    filtered_videos = filter_recent(allvideos, days)
-    return filtered_videos
+    r = requests.post(url, data=data, headers=token_headers)
+    return r.json()["access_token"]
 
-def filter_recent(vods, days):
-    now = datetime.now()
+def get_broadcaster_user_id(channel_name):
+    url = f"https://api.kick.com/public/v1/channels"
+    
+    params = {
+        "slug": channel_name
+    }
+    r = requests.get(url, headers=headers, params=params)
+    return(r.json()["data"][0]["broadcaster_user_id"])
+
+
+def get_all_vods(channel_name):
+    broadcaster_user_id = get_broadcaster_user_id(channel_name)
+    url = f"https://api.kick.com/public/v1/livestreams"
+    params = {
+        "broadcaster_user_id": broadcaster_user_id,
+    }
+
+    r = requests.get(url, headers=headers, params=params)
+    return r.json()["data"]
+
+def vod_filter(vods, days):
+    now = datetime.now(timezone.utc)
     limit = now - timedelta(days=days)
-
     valid = []
-
     for vod in vods:
-        created = vod.created_at
-        video_date = datetime.fromisoformat(created)
-
-        if video_date >= limit:
-            print("video link:", vod.stream)
-            valid.append(vod.stream)
-
+        created_at = vod["created_at"]
+        video_date = datetime.fromisoformat(created_at)
+        if (video_date >= limit):
+            valid.append(vod["url"])
     return valid
 
-#it needs a functionaly api, as this api cannot retrieve the url from the videos
+def get_vods(channel_name, days):
+    
+    all_vods = get_all_vods(channel_name)
+    vods = vod_filter(all_vods, days)
+    return vods
+
+load_dotenv()
+
+client_id = os.getenv("KICK_CLIENT_ID")
+client_secret = os.getenv("KICK_CLIENT_SECRET")
+
+token = get_token(client_id, client_secret)
+
+headers = {
+    "Authorization": f"Bearer {token}"
+}
+
+print(get_all_vods("xQc"))

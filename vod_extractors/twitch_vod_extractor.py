@@ -3,12 +3,6 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 
-def get_vods(channel_name, days):
-    
-    all_vods = all_vods_extractor(channel_name)
-    vods = vod_filter(all_vods, days)
-    return vods
-
 def get_token(client_id, client_secret):
     url = "https://id.twitch.tv/oauth2/token"
 
@@ -51,6 +45,12 @@ def vod_filter(vods, days):
         if (video_date >= limit):
             valid.append(vod["url"])
     return valid
+
+def get_vods(channel_name, days):
+    
+    all_vods = all_vods_extractor(channel_name)
+    vods = vod_filter(all_vods, days)
+    return vods
 
 load_dotenv()
 
