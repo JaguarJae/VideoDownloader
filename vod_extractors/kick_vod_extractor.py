@@ -45,7 +45,7 @@ def search_url(start_time, base_urls, channel_id, video_id):
                     )
             result = try_url(url)
             if result is not None:
-                return url    
+                return url
     return "No URL found"
 
 def try_url(url):
@@ -63,7 +63,3 @@ def get_vods(channel_name, days):
         video_url = get_vod_url(video)
         video_urls.append(video_url)
     return video_urls
-
-
-
-print(get_vods("adrity_35", 14))
