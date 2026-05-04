@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 import os
 from vod_extractors import kick_vod_extractor, twitch_vod_extractor
 import json
+import argparse
 
 def download_url(url):
     url_domain = urlparse(url).netloc
@@ -47,46 +48,33 @@ create_default_config()
 config = load_config()
 
 twitch_channels = config["twitch"]["channels"]
-youtube_channels = config["youtube"]["channels"]
 kick_channels = config["kick"]["channels"]
 
 twitch_days = config["twitch"]["days"]
-youtube_days = config["youtube"]["days"]
 kick_days = config["kick"]["days"]
 
-def ask_input():
-    print("Input URL --> 0 \nRead config.json --> 1 ")
-    option = input("Choose Option: ")
-    if option == "0":
-        url = input("URL: ")
-        print("Downloadng URL...")
-        option_url(url)
-    elif option == "1":
-        print("Reading File...")
-        print("Searching Videos...")
-        option_config()
-    else:
-        print("Bad Input")
-        ask_input()
+parser = argparse.ArgumentParser()
 
-def option_url(url):
-    download_url(url)
+parser.add_argument("--url", nargs="+",type=str)
 
-def option_config():
+args = parser.parse_args()
+
+urls = args.url
+
+if urls == None:
+    print("Reading config.json...")
+    print("Searching videos...")
     twitch_vods = twitch_vod_extractor.get_vods(twitch_channels, twitch_days)
     kick_vods = kick_vod_extractor.get_vods(kick_channels, kick_days)
-    print("twitch vods", twitch_vods)
-    print("kick vods", kick_vods)
-    download_confirmation = input("Do you want to download this vods? y/n: ")
-    if download_confirmation in ["y", "Y"]:
-        print("Downloading vods...")
-        for twitch_vod in twitch_vods:
-            download_url(twitch_vod)
-            print("twitch downloaded")
-        
-        for kick_vod in kick_vods:
-            print("Downloading kick")
-            download_url(kick_vod)
-            print("kick downloaded")
 
-ask_input()
+    print("Downloading vods...")
+    for twitch_vod in twitch_vods:
+        download_url(twitch_vod)
+        print("twitch downloaded")
+        
+    for kick_vod in kick_vods:
+        download_url(kick_vod)
+        print("kick downloaded")
+else:
+    for url in urls:
+        download_url(url)

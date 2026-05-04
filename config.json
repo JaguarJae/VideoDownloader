@@ -1,14 +1,10 @@
 {
     "twitch": {
-        "channels": "",
-        "days": ""
-    },
-    "youtube": {
-        "channels": "",
-        "days": ""
-    },
+        "channels": "peereira7",
+        "days": "2"
+    },    
     "kick": {
-        "channels": "",
-        "days": ""
+        "channels": "adrity_35",
+        "days": "10"
     }
 }

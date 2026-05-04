@@ -1,4 +1,3 @@
 yt-dlp
 kickapi
-cloudscraper
 ffmpeg
