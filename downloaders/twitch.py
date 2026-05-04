@@ -2,7 +2,7 @@ import yt_dlp
 
 def download_url(url):
     ydl_opts = {
-        'outtmpl': f'downloads/"twitch"/%(title)s.%(ext)s',
+        'outtmpl': f'downloads/twitch/%(title)s.%(ext)s',
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]'
     }
 

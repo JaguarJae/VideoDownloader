@@ -1,5 +1,14 @@
 {
-    "twitch_channels": "",
-    "youtube_channels": "",
-    "kick_channels": ""
+    "twitch": {
+        "channels": "",
+        "days": ""
+    },
+    "youtube": {
+        "channels": "",
+        "days": ""
+    },
+    "kick": {
+        "channels": "",
+        "days": ""
+    }
 }

@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timedelta
 
 api = KickAPI()
-
+video_title = "default"
 def get_raw_stream_url(video_url):
 
     parts = video_url.split("/")
@@ -15,6 +15,7 @@ def get_raw_stream_url(video_url):
     video_slug = parts[5]
     print("Searching Videos...")
     video = search_videos(channel_name, video_slug)
+    video_title = video.title
 
     thumbnail_url = video.thumbnail["src"]
     start_time = datetime.strptime(video.start_time, "%Y-%m-%d %H:%M:%S")
@@ -62,9 +63,9 @@ def try_url(url):
         return url
     return None
 
-def raw_download(url, platform):
+def raw_download(url, title):
     ydl_opts = {
-        'outtmpl': f'downloads/{platform}/%(title)s.%(ext)s',
+        'outtmpl': f'downloads/kick/{title}_%(title)s.%(ext)s',
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]'
     }
 
@@ -72,10 +73,12 @@ def raw_download(url, platform):
 
 def download_url(url):
     try: 
-        raw_download(url, "kick")
+        raw_download(url, "master")
     except:
         print("Trying another way")
         raw_url = get_raw_stream_url(url)
         if (raw_url != None):
             print("Found URL:", raw_url)
-            raw_download(raw_url, "kick")
+            raw_download(raw_url, video_title)
+        else:
+            print("No URL found")
