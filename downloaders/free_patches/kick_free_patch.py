@@ -1,5 +1,15 @@
-import requests
 from datetime import datetime, timedelta
+import requests
+
+def get_video_url_from_url(url):
+    url_parts = url.split("/")
+    video_uuid = url_parts[5]
+    video_channel = url_parts[3]
+    video = search_video(video_channel, video_uuid)
+    video_url = get_video_url(video)
+    return video_url
+
+
 
 
 def get_all_vods(channel_name):
@@ -8,18 +18,17 @@ def get_all_vods(channel_name):
 
     return videos
 
+def search_video(channel_name, video_uuid):
+    videos = get_all_vods(channel_name)
 
-def filter_videos(videos, days):
-    limit = datetime.now() - timedelta(days=days)
-    valid = []
     for video in videos:
-        created_at = video["created_at"]
-        video_date = datetime.fromisoformat(created_at)
-        if video_date >= limit:
-            valid.append(video)
-    return valid
+        if video["video"]["uuid"] == video_uuid:
+            return video
+        
+    print("No video found")
+    return None
 
-def get_vod_url(video):
+def get_video_url(video):
     start_time = datetime.strptime(video["start_time"], "%Y-%m-%d %H:%M:%S")
     base_urls = [
             "https://stream.kick.com/ivs/v1/196233775518",
@@ -33,7 +42,6 @@ def get_vod_url(video):
     return video_url
 
 def search_url(start_time, base_urls, channel_id, video_id):
-    urls = []
     for offset in range(-5, 6):
         adjusted_time = start_time + timedelta(minutes=offset)
 
@@ -45,7 +53,7 @@ def search_url(start_time, base_urls, channel_id, video_id):
                     )
             result = try_url(url)
             if result is not None:
-                return url
+                return url    
     return "No URL found"
 
 def try_url(url):
@@ -53,15 +61,3 @@ def try_url(url):
     if response.status_code == 200:
         return url
     return None
-
-def get_vods(channel_name, days):
-    if channel_name == "" or days == "":
-        return None
-    all_videos = get_all_vods(channel_name)
-    filtered_videos = filter_videos(all_videos, float(days))
-
-    video_urls = []
-    for video in filtered_videos:
-        video_url = get_vod_url(video)
-        video_urls.append(video_url)
-    return video_urls

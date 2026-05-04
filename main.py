@@ -1,7 +1,7 @@
-from downloaders import kick ,twitch, youtube
+from downloaders import kick_downloader ,twitch_downloader, youtube_downloader
+from vod_extractors import kick_vod_extractor, twitch_vod_extractor
 from urllib.parse import urlparse
 import os
-from vod_extractors import kick_vod_extractor, twitch_vod_extractor
 import json
 import argparse
 
@@ -10,20 +10,17 @@ def download_url(url):
 
     match url_domain:
         case "www.youtube.com":
-            print(url_domain, "--> Youtube")
-            youtube.download_url(url)
+            youtube_downloader.download_url(url)
 
         case "www.twitch.tv":
-            print(url_domain, "--> Twitch")
-            twitch.download_url(url)
+            twitch_downloader.download_url(url)
 
         case "kick.com" | "stream.kick.com":
-            print(url_domain, "--> Kick")
-            kick.download_url(url)
+            kick_downloader.download_url(url)
         case _:
             print("Platform not supported")
     
-def create_default_config():    
+def create_default_config():
     default_config = {    
         "twitch": {
             "channels": "",
@@ -66,15 +63,18 @@ if urls == None:
     print("Searching videos...")
     twitch_vods = twitch_vod_extractor.get_vods(twitch_channels, twitch_days)
     kick_vods = kick_vod_extractor.get_vods(kick_channels, kick_days)
+    print("twitch vods:", twitch_vods)
+    print("kick vods:", kick_vods)
 
     print("Downloading vods...")
-    for twitch_vod in twitch_vods:
-        download_url(twitch_vod)
-        print("twitch downloaded")
-        
-    for kick_vod in kick_vods:
-        download_url(kick_vod)
-        print("kick downloaded")
+    if twitch_vods is not None:
+        for twitch_vod in twitch_vods:
+            download_url(twitch_vod)
+            print("twitch downloaded")
+    if kick_vods is not None:
+        for kick_vod in kick_vods:
+            download_url(kick_vod)
+            print("kick downloaded")
 else:
     for url in urls:
         download_url(url)

@@ -2,3 +2,4 @@
 /downloads/*
 test.txt
 .env
+config.json
