@@ -55,8 +55,6 @@ def try_url(url):
     return None
 
 def get_vods(channel_name, days):
-    if channel_name == "" or days == "":
-        return None
     all_videos = get_all_vods(channel_name)
     filtered_videos = filter_videos(all_videos, float(days))
 

@@ -47,8 +47,6 @@ def vod_filter(vods, days):
     return valid
 
 def get_vods(channel_name, days):
-    if channel_name == "" or days == "":
-        return None
     all_vods = all_vods_extractor(channel_name)
     vods = vod_filter(all_vods, float(days))
     return vods

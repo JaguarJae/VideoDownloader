@@ -63,7 +63,7 @@ urls = args.url
 
 if urls == None:
     print("Reading config.json...")
-    if twitch_channels != ['']:
+    if twitch_channels != [''] and twitch_days != "":
         print("twitch channels", twitch_channels)
         for twitch_channel in twitch_channels:
             print(f"Searching {twitch_channel} videos...")
@@ -72,16 +72,21 @@ if urls == None:
                 for twitch_vod in twitch_vods:
                     download_url(twitch_vod)
             print(f"{twitch_channel} downloaded")
+    else:
+        print("No twitch info")
 
-    if kick_channels != ['']:
+    if kick_channels != [''] and kick_days != "":
         print("kick channels", kick_channels)
         for kick_channel in kick_channels:
             print(f"Searching {kick_channel} videos...")
             kick_vods = kick_vod_extractor.get_vods(kick_channel, kick_days)
+            print("kick vods:", kick_vods)
             if kick_vods != None:
                 for kick_vod in kick_vods:
                     download_url(kick_vod)
             print(f"{kick_channel} downloaded")
+    else:
+        print("No kick info")
 else:
     for url in urls:
         download_url(url)
