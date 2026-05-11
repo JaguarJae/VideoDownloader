@@ -29,7 +29,8 @@ def create_default_config():
         "kick": {
             "channels": [""],
             "days": ""
-        }
+        },
+        "path": ""
     }
     if not os.path.exists("config.json"):
         with open("config.json", "w") as file:
