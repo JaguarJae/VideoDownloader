@@ -30,7 +30,7 @@ def create_default_config():
             "channels": [""],
             "days": ""
         },
-        "path": ""
+        "path": "./"
     }
     if not os.path.exists("config.json"):
         with open("config.json", "w") as file:
