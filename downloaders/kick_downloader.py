@@ -5,7 +5,7 @@ video_title = "default"
 
 def raw_download(url, path):
     ydl_opts = {
-        'outtmpl': f'{path}kick/%(uploader)s%/%(title)s.%(ext)s',
+        'outtmpl': f'{path}kick/%(uploader)s%/%(title)s-%(upload_date>%d-%m-%Y)s.%(ext)s',
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]'
     }
 

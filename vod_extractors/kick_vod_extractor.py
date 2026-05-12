@@ -2,11 +2,24 @@ import requests
 from datetime import datetime, timedelta
 
 
-def get_all_vods(channel_name):
-    response = requests.get(f"https://kick.com/api/v1/channels/{channel_name}")
-    videos = response.json()["previous_livestreams"]
+def get_channel_info(channel_name):
+    url = f"https://kick.com/api/v1/channels/{channel_name}"
+    headers = {
+        "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+    }
+    response = requests.get(url=url, headers=headers)
+    return response.json()
 
-    return videos
+def get_all_vods(channel_name):
+    all_info = get_channel_info(channel_name)
+    return all_info["previous_livestreams"]
+
+
 
 
 def filter_videos(videos, days):
