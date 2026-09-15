@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
+
 import requests
+
+video_channel = None
 
 def get_video_url_from_url(url):
     url_parts = url.split("/")
@@ -9,11 +12,9 @@ def get_video_url_from_url(url):
     video_url = get_video_url(video)
     return video_url
 
-
-
-
 def get_all_vods(channel_name):
     response = requests.get(f"https://kick.com/api/v1/channels/{channel_name}")
+    print(response, channel_name)
     videos = response.json()["previous_livestreams"]
 
     return videos
@@ -24,15 +25,15 @@ def search_video(channel_name, video_uuid):
     for video in videos:
         if video["video"]["uuid"] == video_uuid:
             return video
-        
+
     print("No video found")
     return None
 
 def get_video_url(video):
-    start_time = datetime.strptime(video["start_time"], "%Y-%m-%d %H:%M:%S")
+    start_time = datetime.strptime(video["start_time"], "%Y-%m-%d %H:%M:%S%z")
     base_urls = [
             "https://stream.kick.com/ivs/v1/196233775518",
-            "https://stream.kick.com/3c81249a5ce0/ivs/v1/196233775518",                        
+            "https://stream.kick.com/3c81249a5ce0/ivs/v1/196233775518",
             "https://stream.kick.com/0f3cb0ebce7/ivs/v1/196233775518"
         ]
     thumbnail_src_parts = video["thumbnail"]["src"].split("/")
@@ -45,7 +46,7 @@ def search_url(start_time, base_urls, channel_id, video_id):
     for offset in range(-5, 6):
         adjusted_time = start_time + timedelta(minutes=offset)
 
-        for base in base_urls:                                                    
+        for base in base_urls:
             url = (
                     f"{base}/{channel_id}/{adjusted_time.year}/{adjusted_time.month}/"
                     f"{adjusted_time.day}/{adjusted_time.hour}/{adjusted_time.minute}/"
@@ -53,7 +54,7 @@ def search_url(start_time, base_urls, channel_id, video_id):
                     )
             result = try_url(url)
             if result is not None:
-                return url    
+                return url
     return "No URL found"
 
 def try_url(url):

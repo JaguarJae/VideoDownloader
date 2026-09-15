@@ -1,9 +1,11 @@
-from downloaders import kick_downloader ,twitch_downloader, youtube_downloader
-from vod_extractors import kick_vod_extractor, twitch_vod_extractor
-from urllib.parse import urlparse
-import os
-import json
 import argparse
+import json
+import os
+from urllib.parse import urlparse
+
+from downloaders import kick_downloader, twitch_downloader, youtube_downloader
+from vod_extractors import kick_vod_extractor, twitch_vod_extractor
+
 
 def download_url(url):
     url_domain = urlparse(url).netloc
@@ -19,13 +21,13 @@ def download_url(url):
             kick_downloader.download_url(url, path)
         case _:
             print("Platform not supported")
-    
+
 def create_default_config():
-    default_config = {    
+    default_config = {
         "twitch": {
             "channels": [""],
             "days": ""
-        },        
+        },
         "kick": {
             "channels": [""],
             "days": ""
@@ -76,7 +78,8 @@ if urls == None:
         print("No twitch info")
 
     if kick_channels != [''] and kick_days != "":
-        print("kick channels", kick_channels)
+        for kick_channel in kick_channels:
+            print(kick_channel)
         for kick_channel in kick_channels:
             print(f"Searching {kick_channel} videos...")
             kick_vods = kick_vod_extractor.get_vods(kick_channel, kick_days)
@@ -90,3 +93,5 @@ if urls == None:
 else:
     for url in urls:
         download_url(url)
+
+#try to add video class to better add metadata to raw videos
