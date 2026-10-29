@@ -1,5 +1,6 @@
-*.pyc
+__pycache__/
 /downloads/*
 test.txt
 .env
 config.json
+.venv/
